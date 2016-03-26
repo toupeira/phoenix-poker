@@ -1,3 +1,5 @@
+module PhoenixPoker where
+
 import String
 import StartApp.Simple as StartApp
 
@@ -86,10 +88,6 @@ view address model =
       [ h2 [ class "ui center aligned icon header" ]
         [ i [ class "circular users icon" ] []
         , text "Planning Poker" ]
-      , node "link" [ rel "stylesheet", href "phoenix-poker.css" ] []
-      , node "link" [ rel "stylesheet", href "//oss.maxcdn.com/semantic-ui/2.1.8/semantic.min.css" ] []
-      , node "script" [ src "//oss.maxcdn.com/semantic-ui/2.1.8/semantic.min.js" ] []
-      , node "script" [ src "//code.jquery.com/jquery-2.2.2.min.js" ] []
       , div [ class "ui five column grid" ] cards
       , table [ class "ui celled table" ]
         [ thead []

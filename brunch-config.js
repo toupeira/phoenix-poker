@@ -32,7 +32,9 @@ exports.config = {
     // This option sets where we should place non-css and non-js assets in.
     // By default, we set this to "/web/static/assets". Files in this directory
     // will be copied to `paths.public`, which is "priv/static" by default.
-    assets: /^(web\/static\/assets)/
+    assets: /^(web\/static\/assets)/,
+
+    ignored: [ /\/elm-stuff\// ],
   },
 
   // Phoenix paths configuration
@@ -40,6 +42,7 @@ exports.config = {
     // Dependencies and current project directories to watch
     watched: [
       "web/static",
+      "web/elm",
       "test/static"
     ],
 
@@ -52,6 +55,11 @@ exports.config = {
     babel: {
       // Do not use ES6 compiler in vendor code
       ignore: [/web\/static\/vendor/]
+    },
+    elmBrunch: {
+      elmFolder: "web/elm",
+      mainModules: [ "PhoenixPoker.elm" ],
+      outputFolder: "../static/vendor"
     }
   },
 
