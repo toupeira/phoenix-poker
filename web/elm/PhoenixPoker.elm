@@ -7,6 +7,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 
+main : Signal Html
 main =
   StartApp.start
     { model = initialTable
@@ -16,10 +17,11 @@ main =
 
 -- MODEL
 
+initialTable : Table
 initialTable =
   { name = "Untitled"
-  , deck = "default"
-  , cards = [ 1.0, 2.0, 3.0, 5.0, 8.0 ]
+  , deck = "a"
+  , cards = [ 1.0, 2.0, 3.0, 5.0, 8.0, 0.0 ]
   , players = []
   , currentRound = { picks = [], points = 0.0 }
   , previousRounds =
@@ -27,6 +29,9 @@ initialTable =
   }
 
 type alias Model = Table
+
+type alias Player =
+  { name: String }
 
 type alias Table =
   { name: String
@@ -37,19 +42,20 @@ type alias Table =
   , previousRounds: List Round
 }
 
+type alias Points = Float
+type alias Card = Points
+type alias CardPick = Card
+
 type alias Round =
   { picks: List CardPick
   , points: Points
 }
 
-type alias Player =
-  { name: String }
+type alias Deck = String
 
-type alias CardPick = Card
-type alias Card = Points
-type alias Points = Float
-
--- UPDATE
+cardDecks : List Deck
+cardDecks =
+  [ "a", "b", "c", "d", "e", "f" ]
 
 type Action
   = PickCard Card
@@ -57,38 +63,37 @@ type Action
   | EndRound
   | ClearTable
 
--- update : Action -> Model -> Model
-update action model =
+update : Action -> Model -> Model
+update action currentTable =
   case action of
     PickCard card ->
       -- TODO: check for existing pick
       -- TODO: replace existing pick
-      let round = model.currentRound
+      let round = currentTable.currentRound
           newRound = { round | picks = round.picks ++ [ card ] }
       in
-        { model | currentRound = newRound }
+        { currentTable | currentRound = newRound }
     StartRound ->
       -- add new round
-      model
+      currentTable
     EndRound ->
       -- set round points from card picks
-      model
+      currentTable
     ClearTable ->
       initialTable
 
-
 -- VIEW
 
--- view : Signal.Address Action -> Model -> Html
-view address model =
-  let previousRounds = List.map (roundView address) model.previousRounds
-      cards = List.map (cardView address) model.cards
+view : Signal.Address Action -> Model -> Html
+view address currentTable =
+  let previousRounds = List.map (roundView address) currentTable.previousRounds
+      cards = List.map (cardView address currentTable.deck) currentTable.cards
   in
-    div [ class "ui container" ]
+    div [ class "ui main container" ]
       [ h2 [ class "ui center aligned icon header" ]
         [ i [ class "circular users icon" ] []
         , text "Planning Poker" ]
-      , div [ class "ui five column grid" ] cards
+      , div [ class "ui eight column centered grid" ] cards
       , table [ class "ui celled table" ]
         [ thead []
           [ tr []
@@ -96,7 +101,7 @@ view address model =
             , th [] [ text "Result" ]
             ]
           ]
-        , tbody [] [ roundView address model.currentRound ]
+        , tbody [] [ roundView address currentTable.currentRound ]
         , tbody [] previousRounds
         ]
       ]
@@ -109,19 +114,19 @@ roundView address round =
     ]
 
 
-cardView : Signal.Address Action -> Card -> Html
-cardView address card =
-  div [ class "column" ]
-    [ a [ class ("ui fluid card card-" ++ (toString card)), onClick address (PickCard card) ]
-      [ div [ class "content" ]
-        [ span [ class "header" ]
-          [ text ((toString card) ++ " " ++ (pluralize card "point" "points")) ]
-        ]
+cardView : Signal.Address Action -> Deck -> Card -> Html
+cardView address deck card =
+  let
+    cardNumber = if card == 0 then "joker" else (toString card)
+    cardImage = "images/cards/" ++ deck ++ "_" ++ cardNumber ++ ".png"
+  in
+    div [ class "column" ]
+      [ a [ class "ui fluid card deck-card", onClick address (PickCard card) ]
+        [ img [ src cardImage ] [] ]
       ]
-    ]
 
 
-pickAverage : List Card -> Int
+pickAverage : List CardPick -> Int
 pickAverage picks =
   case picks of
     [] ->
