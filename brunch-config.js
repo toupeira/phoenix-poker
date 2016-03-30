@@ -82,5 +82,7 @@ exports.config = {
     static: [
       'node_modules/phoenix_html/priv/static/phoenix_html.js'
     ]
-  }
+  },
+
+  notifications: false
 };
