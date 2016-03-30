@@ -63,7 +63,7 @@ exports.config = {
     },
     elmBrunch: {
       elmFolder: 'web/elm',
-      mainModules: [ 'PhoenixPoker.elm' ],
+      mainModules: [ 'Main.elm' ],
       outputFolder: '../static/vendor/elm'
     }
   },
