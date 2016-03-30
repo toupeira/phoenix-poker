@@ -1,5 +1,6 @@
 module Models where
 
+
 type alias Model =
   { player : Player
   , session : Maybe Session }
@@ -33,7 +34,7 @@ type alias CardPick =
 
 initialModel : Model
 initialModel =
-  { player = { id = Nothing , name = "Anonymous" }
+  { player = { id = Nothing , name = "" }
   , session = Nothing
   }
 

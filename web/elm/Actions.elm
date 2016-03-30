@@ -2,9 +2,11 @@ module Actions where
 
 import Models exposing (..)
 
+
 type Action
   = JoinSession Session
   | LeaveSession
+  | ChangeUsername String
   | PickCard Card
   | StartRound
   | EndRound
@@ -17,6 +19,11 @@ update action model =
       { model | session = Just session }
     LeaveSession ->
       { model | session = Nothing }
+    ChangeUsername name ->
+      let
+        newPlayer = changeUsername model.player name
+      in
+        { model | player = newPlayer }
     _ ->
       case model.session of
         Nothing ->
@@ -39,6 +46,11 @@ updateSession action player session =
       session
     _ ->
       session
+
+
+changeUsername : Player -> String -> Player
+changeUsername player name =
+  { player | name = name }
 
 
 pickCard : Session -> Player -> Card -> Session

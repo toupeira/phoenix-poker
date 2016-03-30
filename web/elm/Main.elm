@@ -7,6 +7,7 @@ import Models exposing (..)
 import Views exposing (..)
 import Actions exposing (..)
 
+
 main : Signal Html.Html
 main =
   StartApp.start
