@@ -9,7 +9,6 @@ type alias Session =
   { id : Int
   , name : String
   , deck : String
-  , cards : List Card
   , players : List Player
   , currentRound : Round
   , previousRounds : List Round
@@ -43,11 +42,14 @@ initialSession =
   { id = 1
   , name = "Untitled"
   , deck = "a"
-  , cards = [ 1.0, 2.0, 3.0, 5.0, 8.0, 0.0 ]
   , players = []
   , currentRound = { picks = [], points = 0.0 }
   , previousRounds = []
   }
+
+cardPoints : List Card
+cardPoints =
+  [ 1.0, 2.0, 3.0, 5.0, 8.0, 0.0 ]
 
 cardDecks : List Deck
 cardDecks =

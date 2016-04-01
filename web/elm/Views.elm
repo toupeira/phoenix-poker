@@ -47,7 +47,7 @@ renderLogin address player =
 renderSession : Signal.Address Action -> Player -> Session -> Html
 renderSession address player session =
   let previousRounds = List.map (renderRound address) session.previousRounds
-      cards = List.map (renderCard address session.deck) session.cards
+      cards = List.map (renderCard address session.deck) cardPoints
   in
     div [ class "ui centered grid" ]
       [ button [ class "ui primary button", onClick address (LeaveSession) ]
