@@ -35,7 +35,7 @@ renderLogin address player =
   div [ class "ui centered grid" ]
     [ field [ value player.name, placeholder "Enter your GitHub username" ]
         address ChangeUsername
-    , button [ class "ui primary button", onClick address (JoinSession initialSession) ]
+    , button [ class "ui primary button", onClick address (JoinSession player) ]
       [ text "Join session" ]
     , div [ class "ui row" ]
       [ div [ class "ui huge pointing red label" ]

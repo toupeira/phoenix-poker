@@ -31,14 +31,14 @@ type alias CardPick =
   { player : Player
   , card : Card }
 
-initialModel : Model
-initialModel =
+init : Model
+init =
   { player = { id = Nothing , name = "" }
   , session = Nothing
   }
 
-initialSession : Session
-initialSession =
+initSession : Session
+initSession =
   { id = 1
   , name = "Untitled"
   , deck = "a"

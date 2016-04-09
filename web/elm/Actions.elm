@@ -1,10 +1,12 @@
 module Actions where
 
+import Effects exposing (Effects)
+
 import Models exposing (..)
 
 
 type Action
-  = JoinSession Session
+  = JoinSession Player
   | LeaveSession
   | ChangeUsername String
   | PickCard Card
@@ -12,24 +14,28 @@ type Action
   | EndRound
 
 
-update : Action -> Model -> Model
+update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
-    JoinSession session ->
-      { model | session = Just session }
+    JoinSession player ->
+      ( { model | session = Just initSession }
+      , Effects.none )
     LeaveSession ->
-      { model | session = Nothing }
+      ( { model | session = Nothing }
+      , Effects.none )
     ChangeUsername name ->
       let
         newPlayer = changeUsername model.player name
       in
-        { model | player = newPlayer }
+        ( { model | player = newPlayer }
+        , Effects.none )
     _ ->
       case model.session of
         Nothing ->
-          model
+          ( model, Effects.none )
         Just session' ->
-          { model | session = Just (updateSession action model.player session') }
+          ( { model | session = Just (updateSession action model.player session') }
+          , Effects.none )
 
 
 updateSession : Action -> Player -> Session -> Session
