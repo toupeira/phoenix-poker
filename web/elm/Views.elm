@@ -1,6 +1,7 @@
 module Views where
 
 import String
+import Dict
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -11,14 +12,13 @@ import Helpers exposing (..)
 
 
 view : Signal.Address Action -> Model -> Html
-view address {player, session} =
+view address model =
   let
     mainView =
-      case session of
-        Nothing ->
-          renderLogin address player
-        Just session ->
-          renderSession address player session
+      if isOnline model then
+        renderSession address model
+      else
+        renderLogin address model
   in
     div [ class "ui main container" ]
       [ header []
@@ -30,28 +30,38 @@ view address {player, session} =
       ]
 
 
-renderLogin : Signal.Address Action -> Player -> Html
-renderLogin address player =
+renderLogin : Signal.Address Action -> Model -> Html
+renderLogin address model =
   div [ class "ui centered grid" ]
-    [ field [ value player.name, placeholder "Enter your GitHub username" ]
-        address ChangeUsername
-    , button [ class "ui primary button", onClick address (JoinSession player) ]
-      [ text "Join session" ]
-    , div [ class "ui row" ]
-      [ div [ class "ui huge pointing red label" ]
-        [ text ("Hello " ++ (if String.isEmpty player.name then "Anonymous" else player.name) ++ "!") ]
+    [ field address RenamePlayer
+      [ value model.player.name
+      , placeholder "Enter your GitHub username"
+      , autofocus True ]
+    , field address RenameRoom
+      [ value model.room.name
+      , placeholder "Enter a room name"
+      , autofocus True ]
+    , button
+      [ class "ui primary button"
+      , onClick joinRoom.address (model.room, model.player)
       ]
+      [ text "Join room" ]
     ]
 
 
-renderSession : Signal.Address Action -> Player -> Session -> Html
-renderSession address player session =
-  let previousRounds = List.map (renderRound address) session.previousRounds
-      cards = List.map (renderCard address session.deck) cardPoints
+renderSession : Signal.Address Action -> Model -> Html
+renderSession address model =
+  let previousRounds = List.map (renderRound address) model.previousRounds
+      players = List.map renderPlayer (Dict.values model.players)
+      cards = List.map (renderCard address model.deck) cardPoints
   in
     div [ class "ui centered grid" ]
-      [ button [ class "ui primary button", onClick address (LeaveSession) ]
-        [ text "Leave session" ]
+      [ button
+        [ class "ui primary button"
+        , title (":" ++ model.player.id ++ ":")
+        , onClick leaveRoom.address model.player.id ]
+        [ text "Leave room" ]
+      , div [ class "ui row" ] players
       , div [ class "ui row" ] cards
       , table [ class "ui celled table" ]
         [ thead []
@@ -60,7 +70,7 @@ renderSession address player session =
             , th [] [ text "Result" ]
             ]
           ]
-        , tbody [] [ renderRound address session.currentRound ]
+        , tbody [] [ renderRound address model.currentRound ]
         , tbody [] previousRounds
         ]
       ]
@@ -84,3 +94,16 @@ renderCard address deck card =
       [ a [ class "ui fluid card deck-card", onClick address (PickCard card) ]
         [ img [ src cardImage ] [] ]
       ]
+
+
+renderPlayer : Player -> Html
+renderPlayer player =
+  img
+    [ class "ui circular image"
+    , alt player.name
+    , title player.name
+    , width 40
+    , height 40
+    , src ("https://github.com/" ++ player.name ++ ".png?size=40")
+    ]
+    []

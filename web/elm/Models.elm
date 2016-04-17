@@ -1,21 +1,25 @@
 module Models where
 
+import Dict exposing (Dict)
+
+
+type alias ID = String
 
 type alias Model =
   { player : Player
-  , session : Maybe Session }
-
-type alias Session =
-  { id : Int
-  , name : String
+  , room : Room
   , deck : String
-  , players : List Player
+  , players : Dict String Player
   , currentRound : Round
   , previousRounds : List Round
-}
+  }
+
+type alias Room =
+  { id : ID
+  , name : String }
 
 type alias Player =
-  { id : Maybe Int
+  { id : ID
   , name : String }
 
 type alias Deck = String
@@ -24,28 +28,34 @@ type alias Points = Float
 
 type alias Round =
   { picks : List CardPick
-  , points : Points
-}
+  , points : Points }
 
 type alias CardPick =
   { player : Player
   , card : Card }
 
-init : Model
-init =
-  { player = { id = Nothing , name = "" }
-  , session = Nothing
-  }
 
-initSession : Session
-initSession =
-  { id = 1
-  , name = "Untitled"
+init : ID -> Model
+init playerId =
+  { player = (initPlayer playerId)
+  , room = initRoom
   , deck = "a"
-  , players = []
-  , currentRound = { picks = [], points = 0.0 }
+  , players = Dict.empty
+  , currentRound = initRound
   , previousRounds = []
   }
+
+initPlayer : ID -> Player
+initPlayer playerId =
+  { id = playerId, name = "" }
+
+initRoom : Room
+initRoom =
+  { id = "", name = "" }
+
+initRound : Round
+initRound =
+  { picks = [], points = 0.0 }
 
 cardPoints : List Card
 cardPoints =
@@ -54,3 +64,7 @@ cardPoints =
 cardDecks : List Deck
 cardDecks =
   [ "a", "b", "c", "d", "e", "f" ]
+
+isOnline : Model -> Bool
+isOnline model =
+  Dict.member model.player.id model.players

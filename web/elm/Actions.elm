@@ -1,71 +1,97 @@
 module Actions where
 
+import Dict
 import Effects exposing (Effects)
 
 import Models exposing (..)
 
 
 type Action
-  = JoinSession Player
-  | LeaveSession
-  | ChangeUsername String
+  = PlayerJoined Player
+  | PlayerLeft ID
+  | RenamePlayer String
+  | RenameRoom String
   | PickCard Card
   | StartRound
   | EndRound
 
 
+joinRoom : Signal.Mailbox (Room, Player)
+joinRoom =
+  Signal.mailbox (initRoom, initPlayer "")
+
+leaveRoom : Signal.Mailbox ID
+leaveRoom =
+  Signal.mailbox ""
+
+
 update : Action -> Model -> (Model, Effects Action)
 update action model =
   case action of
-    JoinSession player ->
-      ( { model | session = Just initSession }
-      , Effects.none )
-    LeaveSession ->
-      ( { model | session = Nothing }
-      , Effects.none )
-    ChangeUsername name ->
+    PlayerJoined player ->
       let
-        newPlayer = changeUsername model.player name
+        players = Dict.insert player.id player model.players
+        newModel = { model | players = players }
       in
-        ( { model | player = newPlayer }
-        , Effects.none )
+        ( newModel, Effects.none )
+    PlayerLeft playerId ->
+      let
+        players = if playerId == model.player.id then
+          Dict.empty
+        else
+          Dict.remove playerId model.players
+        newModel = { model | players = players }
+      in
+        ( newModel, Effects.none )
+    RenamePlayer name ->
+      let
+        newModel = { model | player = renamePlayer model.player name }
+      in
+        ( newModel, Effects.none )
+    RenameRoom name ->
+      let
+        newModel = { model | room = renameRoom model.room name }
+      in
+        ( newModel, Effects.none )
     _ ->
-      case model.session of
-        Nothing ->
-          ( model, Effects.none )
-        Just session' ->
-          ( { model | session = Just (updateSession action model.player session') }
-          , Effects.none )
+      if isOnline model then
+        updateSession action model
+      else
+        ( model, Effects.none )
 
 
-updateSession : Action -> Player -> Session -> Session
-updateSession action player session =
+updateSession : Action -> Model -> (Model, Effects Action)
+updateSession action model =
   case action of
     PickCard card ->
-      -- pickCard session player card
-      pickCard session player card
+      ( (pickCard model card), Effects.none )
     StartRound ->
       -- add new round
-      session
+      ( model, Effects.none )
     EndRound ->
       -- set round points from card picks
-      session
+      ( model, Effects.none )
     _ ->
-      session
+      ( model, Effects.none )
 
 
-changeUsername : Player -> String -> Player
-changeUsername player name =
+renamePlayer : Player -> String -> Player
+renamePlayer player name =
   { player | name = name }
 
 
-pickCard : Session -> Player -> Card -> Session
-pickCard session player card =
+renameRoom : Room -> String -> Room
+renameRoom room name =
+  { room | name = name }
+
+
+pickCard : Model -> Card -> Model
+pickCard model card =
   -- TODO: check for existing pick
   -- TODO: replace existing pick
   let
-    newPick = CardPick player card
-    round = session.currentRound
+    newPick = CardPick model.player card
+    round = model.currentRound
     newRound = { round | picks = round.picks ++ [ newPick ] }
   in
-    { session | currentRound = newRound }
+    { model | currentRound = newRound }

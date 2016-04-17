@@ -28,8 +28,8 @@ pickAverage picks =
           round (sum / length)
 
 
-field : List Attribute -> Signal.Address Action -> (String -> Action) -> Html
-field attrs address action =
+field : Signal.Address Action -> (String -> Action) -> List Attribute -> Html
+field address action attrs =
   div [ class "ui input" ]
     [ input
       ([ type' "text"
