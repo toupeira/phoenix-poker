@@ -9,9 +9,8 @@ type alias Model =
   { player : Player
   , room : Room
   , deck : String
-  , players : Dict String Player
-  , currentRound : Round
-  , previousRounds : List Round
+  , players : Dict ID Player
+  , picks : Dict ID Card
   }
 
 type alias Room =
@@ -26,12 +25,8 @@ type alias Deck = String
 type alias Card = Points
 type alias Points = Float
 
-type alias Round =
-  { picks : List CardPick
-  , points : Points }
-
 type alias CardPick =
-  { player : Player
+  { playerId : ID
   , card : Card }
 
 
@@ -41,8 +36,7 @@ init playerId =
   , room = initRoom
   , deck = "a"
   , players = Dict.empty
-  , currentRound = initRound
-  , previousRounds = []
+  , picks = Dict.empty
   }
 
 initPlayer : ID -> Player
@@ -52,10 +46,6 @@ initPlayer playerId =
 initRoom : Room
 initRoom =
   { id = "", name = "" }
-
-initRound : Round
-initRound =
-  { picks = [], points = 0.0 }
 
 cardPoints : List Card
 cardPoints =

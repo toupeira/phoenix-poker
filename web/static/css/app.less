@@ -4,11 +4,24 @@ header {
   padding: 2em 0;
 }
 
-.deck-card {
+.poker-card {
+  position: relative;
   padding: 0;
 
   img {
     width: 100%;
     height: auto;
   }
+
+  &-players {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+  }
+}
+
+.poker-player {
+  margin: 5px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
 }

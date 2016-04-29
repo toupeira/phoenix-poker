@@ -1,14 +1,14 @@
 module Views where
 
-import String
-import Dict
+import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 
 import Models exposing (..)
 import Actions exposing (..)
-import Helpers exposing (..)
+import Widgets exposing (..)
+import Util
 
 
 view : Signal.Address Action -> Model -> Html
@@ -51,9 +51,9 @@ renderLogin address model =
 
 renderSession : Signal.Address Action -> Model -> Html
 renderSession address model =
-  let previousRounds = List.map (renderRound address) model.previousRounds
-      players = List.map renderPlayer (Dict.values model.players)
-      cards = List.map (renderCard address model.deck) cardPoints
+  let
+    players = List.map renderPlayer (Dict.values model.players)
+    cards = List.map (renderCard address model) cardPoints
   in
     div [ class "ui centered grid" ]
       [ button
@@ -70,36 +70,35 @@ renderSession address model =
             , th [] [ text "Result" ]
             ]
           ]
-        , tbody [] [ renderRound address model.currentRound ]
-        , tbody [] previousRounds
         ]
       ]
 
 
-renderRound : Signal.Address Action -> Round -> Html
-renderRound address round =
-  tr []
-    [ td [] [ text (String.join ", " (List.map toString round.picks)) ]
-    , td [] [ text (toString (pickAverage round.picks)) ]
-    ]
-
-
-renderCard : Signal.Address Action -> Deck -> Card -> Html
-renderCard address deck card =
+renderCard : Signal.Address Action -> Model -> Card -> Html
+renderCard address model card =
   let
     cardNumber = if card == 0 then "joker" else (toString card)
-    cardImage = "images/cards/" ++ deck ++ "_" ++ cardNumber ++ ".png"
+    cardImage = "images/cards/" ++ model.deck ++ "_" ++ cardNumber ++ ".png"
+    players =
+      model.picks
+        |> Dict.filter (\key value -> value == card)
+        |> Dict.keys
+        |> Util.slice model.players
+        |> List.map renderPlayer
   in
     div [ class "ui two wide column" ]
-      [ a [ class "ui fluid card deck-card", onClick address (PickCard card) ]
+      [ a
+        [ class "ui fluid card poker-card"
+        , onClick pickCard.address card ]
         [ img [ src cardImage ] [] ]
+      , div [ class "poker-card-players" ] players
       ]
 
 
 renderPlayer : Player -> Html
 renderPlayer player =
   img
-    [ class "ui circular image"
+    [ class "ui circular image poker-player"
     , alt player.name
     , title player.name
     , width 40

@@ -18,7 +18,8 @@ app =
     , update = update
     , inputs =
       [ Signal.map PlayerJoined playerJoinedEvent
-      , Signal.map PlayerLeft playerLeftEvent ]
+      , Signal.map PlayerLeft playerLeftEvent
+      , Signal.map CardPicked cardPickedEvent ]
     }
 
 
@@ -26,6 +27,8 @@ main : Signal Html.Html
 main =
   app.html
 
+
+-- outgoing ports
 
 port runner : Signal (Task Never ())
 port runner =
@@ -39,6 +42,14 @@ port leaveRoomEvent : Signal ID
 port leaveRoomEvent =
   leaveRoom.signal
 
+port pickCardEvent : Signal Card
+port pickCardEvent =
+  pickCard.signal
+
+
+-- incoming ports
+
 port playerId : ID
 port playerJoinedEvent : Signal Player
 port playerLeftEvent : Signal ID
+port cardPickedEvent : Signal CardPick

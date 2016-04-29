@@ -27,6 +27,14 @@ defmodule PhoenixPoker.RoomChannel do
     {:noreply, socket}
   end
 
+  def handle_in("card_pick", %{ "card" => card }, socket) do
+    broadcast! socket, "card_picked",
+      %{ playerId: socket.assigns[:player][:id],
+         card: card }
+
+    {:noreply, socket}
+  end
+
   def handle_out("player_reply", player, socket) do
     # let other players reply with their own info when a new player joins
     if player[:id] != socket.assigns[:player][:id] do

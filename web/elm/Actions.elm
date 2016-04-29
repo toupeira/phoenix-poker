@@ -11,7 +11,7 @@ type Action
   | PlayerLeft ID
   | RenamePlayer String
   | RenameRoom String
-  | PickCard Card
+  | CardPicked CardPick
   | StartRound
   | EndRound
 
@@ -23,6 +23,10 @@ joinRoom =
 leaveRoom : Signal.Mailbox ID
 leaveRoom =
   Signal.mailbox ""
+
+pickCard : Signal.Mailbox Card
+pickCard =
+  Signal.mailbox 0
 
 
 update : Action -> Model -> (Model, Effects Action)
@@ -63,8 +67,12 @@ update action model =
 updateSession : Action -> Model -> (Model, Effects Action)
 updateSession action model =
   case action of
-    PickCard card ->
-      ( (pickCard model card), Effects.none )
+    CardPicked pick ->
+      let
+        picks = Dict.insert pick.playerId pick.card model.picks
+        newModel = { model | picks = picks }
+      in
+        ( newModel, Effects.none )
     StartRound ->
       -- add new round
       ( model, Effects.none )
@@ -83,15 +91,3 @@ renamePlayer player name =
 renameRoom : Room -> String -> Room
 renameRoom room name =
   { room | name = name }
-
-
-pickCard : Model -> Card -> Model
-pickCard model card =
-  -- TODO: check for existing pick
-  -- TODO: replace existing pick
-  let
-    newPick = CardPick model.player card
-    round = model.currentRound
-    newRound = { round | picks = round.picks ++ [ newPick ] }
-  in
-    { model | currentRound = newRound }

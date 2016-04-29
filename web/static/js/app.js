@@ -7,7 +7,8 @@ const Player = {
 const App = Elm.fullscreen(Elm.Main, {
   playerId: Player.id,
   playerJoinedEvent: { id: "", name: "" },
-  playerLeftEvent: ""
+  playerLeftEvent: "",
+  cardPickedEvent: { playerId: "", card: 0 }
 });
 
 // initialize channel socket
@@ -48,8 +49,17 @@ App.ports.joinRoomEvent.subscribe(([room, player]) => {
       channel = undefined;
     }
   });
+
+  channel.on("card_picked", (pick) => {
+    console.log('Card picked:', pick);
+    App.ports.cardPickedEvent.send(pick);
+  });
 });
 
 App.ports.leaveRoomEvent.subscribe((playerId) => {
   channel.push("player_left", { id: playerId });
+});
+
+App.ports.pickCardEvent.subscribe((card) => {
+  channel.push("card_pick", { card: card });
 });
