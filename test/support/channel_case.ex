@@ -20,22 +20,12 @@ defmodule PhoenixPoker.ChannelCase do
       # Import conveniences for testing with channels
       use Phoenix.ChannelTest
 
-      alias PhoenixPoker.Repo
-      import Ecto
-      import Ecto.Changeset
-      import Ecto.Query, only: [from: 1, from: 2]
-
-
       # The default endpoint for testing
       @endpoint PhoenixPoker.Endpoint
     end
   end
 
   setup tags do
-    unless tags[:async] do
-      Ecto.Adapters.SQL.restart_test_transaction(PhoenixPoker.Repo, [])
-    end
-
     :ok
   end
 end

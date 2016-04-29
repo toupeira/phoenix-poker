@@ -18,21 +18,12 @@ defmodule PhoenixPoker.Web do
 
   def model do
     quote do
-      use Ecto.Schema
-
-      import Ecto
-      import Ecto.Changeset
-      import Ecto.Query, only: [from: 1, from: 2]
     end
   end
 
   def controller do
     quote do
       use Phoenix.Controller
-
-      alias PhoenixPoker.Repo
-      import Ecto
-      import Ecto.Query, only: [from: 1, from: 2]
 
       import PhoenixPoker.Router.Helpers
       import PhoenixPoker.Gettext
@@ -65,9 +56,6 @@ defmodule PhoenixPoker.Web do
     quote do
       use Phoenix.Channel
 
-      alias PhoenixPoker.Repo
-      import Ecto
-      import Ecto.Query, only: [from: 1, from: 2]
       import PhoenixPoker.Gettext
     end
   end

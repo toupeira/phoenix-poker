@@ -31,9 +31,3 @@ config :logger, :console, format: "[$level] $message\n"
 # Do not configure such in production as keeping
 # and calculating stacktraces is usually expensive.
 config :phoenix, :stacktrace_depth, 20
-
-# Configure your database
-config :phoenix_poker, PhoenixPoker.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  database: "phoenix_poker_dev",
-  pool_size: 10

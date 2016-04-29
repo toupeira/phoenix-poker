@@ -8,9 +8,3 @@ config :phoenix_poker, PhoenixPoker.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
-
-# Configure your database
-config :phoenix_poker, PhoenixPoker.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  database: "phoenix_poker_test",
-  pool: Ecto.Adapters.SQL.Sandbox
